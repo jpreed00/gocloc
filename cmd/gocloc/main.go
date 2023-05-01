@@ -43,6 +43,7 @@ var rowLen = 79
 // It is necessary to use notation that follows go-flags.
 type CmdOptions struct {
 	Byfile         bool   `long:"by-file" description:"report results for every encountered source file"`
+	RecursionOff   bool   `long:"recursion-off" description:"turn off directory recursion"`
 	SortTag        string `long:"sort" default:"code" description:"sort based on a certain column"`
 	OutputType     string `long:"output-type" default:"default" description:"output type [values: default,cloc-xml,sloccount,json]"`
 	ExcludeExt     string `long:"exclude-ext" description:"exclude file name extensions (separated commas)"`
@@ -210,7 +211,7 @@ func main() {
 
 	paths, err := flags.Parse(&opts)
 	if err != nil {
-		return
+		panic(err)
 	}
 
 	// value for language result
@@ -264,6 +265,7 @@ func main() {
 
 	clocOpts.Debug = opts.Debug
 	clocOpts.SkipDuplicated = opts.SkipDuplicated
+	clocOpts.RecursionOff = opts.RecursionOff
 
 	processor := gocloc.NewProcessor(languages, clocOpts)
 	result, err := processor.Analyze(paths)

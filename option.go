@@ -12,7 +12,8 @@ type ClocOptions struct {
 	ReMatch        *regexp.Regexp
 	ReNotMatchDir  *regexp.Regexp
 	ReMatchDir     *regexp.Regexp
-
+	RecursionOff   bool
+	
 	// OnCode is triggered for each line of code.
 	OnCode func(line string)
 	// OnBlack is triggered for each blank line.

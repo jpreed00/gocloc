@@ -59,7 +59,7 @@ func isVCSDir(path string) bool {
 	if len(path) > 1 && path[0] == os.PathSeparator {
 		path = path[1:]
 	}
-	vcsDirs := []string{".bzr", ".cvs", ".hg", ".git", ".svn"}
+	vcsDirs := []string{".bzr", ".cvs", ".hg", ".git", ".svn", "$tf"}
 	for _, dir := range vcsDirs {
 		if strings.Contains(path, dir) {
 			return true
@@ -77,7 +77,6 @@ func checkDefaultIgnore(path string, info os.FileInfo, isVCS bool) bool {
 		// vcs file or directory is ignore
 		return true
 	}
-
 	return false
 }
 
@@ -111,9 +110,15 @@ func getAllFiles(paths []string, languages *DefinedLanguages, opts *ClocOptions)
 		vcsInRoot := isVCSDir(root)
 		err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err)
+				fmt.Fprintf(os.Stderr, "err: %s\npath: %s\n", err, path)
 				return nil
 			}
+
+			//maybe there's a better way of checking if this is the root directory?
+			if path != root && info.IsDir() && opts.RecursionOff {
+				return filepath.SkipDir
+			}
+
 			if ignore := checkDefaultIgnore(path, info, vcsInRoot); ignore {
 				return nil
 			}
